@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>搜狐－Zookeeper View</title>
+<link href="js/themes/default/easyui.css" rel="stylesheet"
+	type="text/css" />
+<link href="js/themes/icon.css" rel="stylesheet" type="text/css" />
+<link href="css/DefaultPage.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-1.4.4.min.js" type="text/javascript"></script>
+<script src="js/jquery.easyui.min.js" type="text/javascript"></script>
+<script src="js/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	var path = "${path}";
+
+	function loadData(url) {
+		$('#tt').tree({
+			method : "get",
+			url : 'tree_data.json?name=' + url,
+			onClick : function(node) {
+				var sinpath = node.attributes.path;
+				$.ajax({
+					type : "get",
+					url : "dir_data.json?name=" + sinpath,
+					success : function(msg) {
+						if (msg != null && msg != "-1") {
+							$("#dataoutput").html(msg);
+							$('#dataoutput').window('open');
+							//$.messager.alert('Data Output', msg);
+						} else if (msg == "") {
+							$.messager.alert('Warning', '该节点未加载到数据!');
+						} else {
+							$.messager.alert('Warning', '获取数据失败!');
+						}
+					}
+				});
+			},
+			onContextMenu : function(e, node) {
+				e.preventDefault();
+				$('#tt').tree('select', node.target);
+				$('#mm').menu('show', {
+					left : e.pageX,
+					top : e.pageY
+				});
+			},
+			onBeforeLoad:function(node, param)
+			{
+				$("<div class=\"datagrid-mask-msg\"></div>").html("正在努力为您加载，请稍候.....")
+				.appendTo("body").css({
+					display : "block",
+					left : ($(document.body).outerWidth(true) - 190) / 2,
+					top : ($(window).height() - 45) / 2
+				});
+			},
+			onLoadSuccess : function(node, data) {
+				 $(".datagrid-mask-msg").remove();  
+			}
+		});
+	}
+
+	$(function() {
+		$('#dataoutput').window({
+			width : 600,
+			height : 400,
+			modal : true
+		});
+		$('#dataoutput').window('close');
+		loadData(path);
+	});
+
+	function reload() {
+		var node = $('#tt').tree('getSelected');
+		if (node) {
+			$('#tt').tree('reload', node.target);
+		} else {
+			$('#tt').tree('reload');
+		}
+	}
+
+	function getChildren() {
+		var node = $('#tt').tree('getSelected');
+		if (node) {
+			var children = $('#tt').tree('getChildren', node.target);
+		} else {
+			var children = $('#tt').tree('getChildren');
+		}
+		var s = '';
+		for ( var i = 0; i < children.length; i++) {
+			s += children[i].text + ',';
+		}
+		alert(s);
+	}
+
+	function getChecked() {
+		var nodes = $('#tt').tree('getChecked');
+		var s = '';
+		for ( var i = 0; i < nodes.length; i++) {
+			if (s != '')
+				s += ',';
+			s += nodes[i].text;
+		}
+		alert(s);
+	}
+
+	function getSelected() {
+		var node = $('#tt').tree('getSelected');
+		alert(node.text);
+	}
+
+	function collapse() {
+		var node = $('#tt').tree('getSelected');
+		$('#tt').tree('collapse', node.target);
+	}
+
+	function expand() {
+		var node = $('#tt').tree('getSelected');
+		$('#tt').tree('expand', node.target);
+	}
+
+	function collapseAll() {
+		var node = $('#tt').tree('getSelected');
+		if (node) {
+			$('#tt').tree('collapseAll', node.target);
+		} else {
+			$('#tt').tree('collapseAll');
+		}
+	}
+
+	function expandAll() {
+		var node = $('#tt').tree('getSelected');
+		if (node) {
+			$('#tt').tree('expandAll', node.target);
+		} else {
+			$('#tt').tree('expandAll');
+		}
+	}
+</script>
+</head>
+<body>
+	<div id="mm" class="subserverleft">
+		<ul id="tt">
+		</ul>
+	</div>
+	<div class="subserverright">
+		<div id="datatable"></div>
+	</div>
+	<div id="dataoutput"></div>
+</body>
+</html>

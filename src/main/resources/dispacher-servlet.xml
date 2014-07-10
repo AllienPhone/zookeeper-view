@@ -1,0 +1,53 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	<context:component-scan base-package="com.sohu.zookeeper.view"></context:component-scan>
+
+	<mvc:resources mapping="/css/**" location="/css/**" />
+	<mvc:resources mapping="/js/**" location="/js/**" />
+	<mvc:resources mapping="/img/**" location="/img/**" />
+	<mvc:resources mapping="/images/**" location="/images/**" />
+	<mvc:resources location="/resources/**" mapping="/resources/**" />
+	<mvc:resources location="/favorite.ico" mapping="/favorite.ico" />
+
+	<!-- Forwards requests to the "/" resource to the "welcome" view -->
+	<mvc:view-controller path="/" view-name="index" />
+	<mvc:view-controller path="/index.html" view-name="index" />
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>text/html;charset=UTF-8</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="stringHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="stringHttpMessageConverter"
+		class="org.springframework.http.converter.StringHttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/plain;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	<mvc:annotation-driven />
+	<import resource="freemarker.xml" />
+</beans>

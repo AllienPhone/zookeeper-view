@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>搜狐－Zookeeper View</title>
+<link href="js/themes/default/easyui.css" rel="stylesheet"
+	type="text/css" />
+<link href="js/themes/icon.css" rel="stylesheet" type="text/css" />
+<script src="js/jquery-1.4.4.min.js" type="text/javascript"></script>
+<script src="js/jquery.easyui.min.js" type="text/javascript"></script>
+<script src="js/locale/easyui-lang-zh_CN.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+	$(function() {
+		//初始化
+		initTable();
+	});
+
+	//个人习惯方法化书写
+	function initTable() {
+		$("#dd").dialog({
+			closable : false, //右上角的关闭按钮，因为dialog框架关联的是window框架，window框架关联的是panel框架，所以该API是在panel框架中找到的
+			title : "Sohu Zookeeper View", //dialog左上角的名称
+			modal : true, //模式化
+			width : 400,
+			height : 180,
+			buttons : [//dialog右下角的按钮，以Json数组形式添加
+			{
+				text : "查看", //按钮名称
+				iconCls : "icon-save", //按钮左侧显示的图片
+				handler : function() {//按钮点击之后出发的方法
+					//JQuery的ajax异步后台提交
+					loginFunc();
+				}
+			} ]
+		});
+	}
+
+	//用户登录
+	function loginFunc() {
+		var server = $("#server").val();
+		var port = $("#port").val();
+		//这里我写的是最简略的JQuery异步方法，如想深入了解，请参看JQuery参考手册
+		//要想后台传递的参数
+		var res = $("#loginForm").serialize(); //将form表单的内容序列化,这里也可以使用原始的取值方法
+		if (null == server || "" == server||null==port||""==port) {
+			$.messager.alert('Warning', '请输入服务器地址和端口');
+			return;
+		}
+
+		//mvc以及webform中可以直接传递到后台
+		$.post("server.html", res, function(data) {
+			if (data == "ok") {//后台传递过来 ok 表示登陆成功
+				window.location.href = "server.html";
+			} else {
+				$.messager.alert('Warning', '服务器验证失败'); //这里使用easyui的message框架，弹出提示信息
+				//这里有三个参数 第一个是Title 第二个是显示信息 第三个是现实图标样式 有error，warning等，具体请看API或者demo
+			}
+		});
+	}
+</script>
+<style type="text/css">
+#dd table {
+	margin-top: 20px;
+	margin-left: 30px;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+#dd table tr {
+	height: 30px;
+}
+
+#dd table th {
+	font-weight: normal;
+}
+</style>
+</head>
+<body>
+	<div id="dd">
+		<form id="loginForm" method="POST">
+			<table>
+				<tr>
+					<th>服务器地址:</th>
+					<td><input id="server" name="server" type="text" /></td>
+				</tr>
+				<tr>
+					<th>服务器端口:</th>
+					<td><input id="port" name="port" type="text" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</body>
+</html>
